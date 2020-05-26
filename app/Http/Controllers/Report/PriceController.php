@@ -50,4 +50,14 @@ class PriceController extends Controller
     {
         return 'TAIWAN: ' . $priceRepository->getTaiwanPrice() . ',<br> JAPAN: ' . $priceRepository->getJapanPrice();
     }
+
+    /**
+     * 測試 單純使用參數的
+     * @param $str
+     * @return mixed
+     */
+    public function test02($str = 'Hello')
+    {
+        return $str;
+    }
 }

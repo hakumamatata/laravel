@@ -176,11 +176,15 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+
+
         /*
          * My Service Providers...
          */
         App\Providers\PriceProvider::class,
         App\Providers\ResponseMacroServiceProvider::class,
+        App\Providers\View\ViewServiceProvider::class,
+        App\Providers\UserServiceProvider::class,
     ],
 
     /*

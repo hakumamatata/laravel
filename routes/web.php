@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Url;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +47,8 @@ Route::prefix('admin')->group(function () {
 Route::get('tw/price/list', 'Report\PriceController@taiwan');
 Route::get('jp/price/list', 'Report\PriceController@japan');
 Route::get('price/list/test', 'Report\PriceController@test');
+// test02($str)
+Route::get('price/list/test02/{str}', 'Report\PriceController@test02');
 
 # Resource Route 假使要自定義路由 需要在resource (但是建議保持類的專一性 如有需求可再拆解成多個小的控制器)
 Route::get('photos/popular', 'PhotoController@method');
@@ -141,6 +146,80 @@ Route::get('file', function () {
 Route::get('responseMacro/{name}', function ($name) {
     return response()->book($name);
 })->where(['name' => '[a-z]+']);
+
+# View相關
+Route::get('view', function () {
+//    return view('greeting', ['name' => 'Michael']);
+
+    if (View::exists('admin.profile')) {
+        return view('admin.profile', ['name' => 'Mary']);
+    } else {
+        return view('greeting', ['name' => 'Michael']);
+    }
+
+    # first
+//    return view()->first(['greeting', 'admin.profile'], ['name' => 'Ken']);
+//    return View::first(['admin.profile', 'greeting'], ['name' => 'Ken']);
+
+    # 也可以透過 with
+//    return view('greeting')->with('name', 'Victoria');
+
+    # 全局的可以再覆蓋
+//    return view('greeting')->with('name', 'Victoria')->with('company', 'Yahoo');
+});
+
+# Url相關
+Route::get('url', function () {
+    echo url('viewOthers/777'), '<br>';
+
+    echo url()->current(), '<br>';
+//    echo Url::current(), '<br>';
+
+    echo url()->full(), '<br>';
+//    echo Url::full(), '<br>';
+
+    echo url()->previous(), '<br>';
+//    echo Url::previous(), '<br>';
+
+    # controller route
+    echo action('Report\PriceController@test'), '<br>';
+    echo action([\App\Http\Controllers\Report\PriceController::class, 'taiwan']), '<br>';
+    echo action([\App\Http\Controllers\Report\PriceController::class, 'test02'], ['str' => 'Hello World']), '<br>';
+
+    exit;
+});
+// 簽名請求
+Route::get('signedUrl', function () {
+//    return URL::signedRoute('unsubscribe', ['name' => 'Dave']);
+
+    // 可以設定有效期限
+    return URL::temporarySignedRoute(
+        'unsubscribe', now()->addSeconds(30), ['name' => 'Yarn']
+    );
+});
+// 驗證授權
+Route::get('/unsubscribe/{name}', function (Request $request, $name) {
+    if (! $request->hasValidSignature()) {
+        abort(401);
+    }
+
+    return 'Pass By ' . $name;
+})->name('unsubscribe');
+// 預設值
+Route::get('/{locale}/url', function () {
+    echo url()->current(), '<br>';
+
+    echo 'Developer Test...', '<br>';
+
+    exit;
+})->middleware(\App\Http\Middleware\User\SetDefaultLocaleForUrls::class);
+
+
+
+
+
+
+
 
 
 # 此應為註冊的最後一個路由 (可以自定義找不到路由時 要做的處理)
